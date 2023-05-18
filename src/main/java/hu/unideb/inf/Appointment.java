@@ -1,6 +1,8 @@
 package hu.unideb.inf;
 
 import java.time.LocalDateTime;
+import hu.unideb.inf.model.Barber;
+import hu.unideb.inf.model.Customer;
 
 public class Appointment {
     private int id;

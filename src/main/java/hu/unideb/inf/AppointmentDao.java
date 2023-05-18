@@ -1,6 +1,8 @@
 package hu.unideb.inf;
 
-import hu.unideb.inf.model.Appointment;
+
+import hu.unideb.inf.model.Barber;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;

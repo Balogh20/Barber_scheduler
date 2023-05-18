@@ -1,9 +1,16 @@
 package hu.unideb.inf;
 
 import hu.unideb.inf.model.*;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import antlr.collections.List;
-import hu.unideb.inf.dao.*;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -28,6 +35,8 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Hairdresser Appointment Booking");
 
+        // Initialize database with some data
+        initializeDatabase();
         // Login Scene
         GridPane loginPane = new GridPane();
         TextField usernameField = new TextField();
@@ -73,15 +82,8 @@ public class MainApp extends Application {
 
             if (customer != null && customer.getPassword().equals(password)) {
                 setupCustomerInterface(customer);
-            } else if (barber != null && barber.getPassword().equals(password)) {
-                setupBarberInterface(barber);
-            } else {
-                loginLabel.setText("Invalid username or password. Please try again.");
-            }
-        });
-                mainPane.getChildren().setAll(customerPane);
-                primaryStage.setScene(mainScene);
-            } else if (barber != null && barber.getPassword().equals(password)) {
+            } 
+             else if (barber != null && barber.getPassword().equals(password)) {
                 // Set up barber interface
                 ObservableList<Appointment> appointments = FXCollections.observableArrayList(appointmentDao.findAllByBarber(barber));
                 appointmentListView.setItems(appointments);
@@ -101,6 +103,9 @@ public class MainApp extends Application {
     private void setupCustomerInterface(Customer customer) {
         VBox mainPane = new VBox();
     
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/path/to/your/fxml/customer_interface.fxml"));
+            VBox mainPane = loader.load();
         // Display customer's name
         Label welcomeLabel = new Label("Welcome, " + customer.getName());
         mainPane.getChildren().add(welcomeLabel);
@@ -132,7 +137,6 @@ public class MainApp extends Application {
                 Appointment appointment = new Appointment(customer, barber, dateTime);
                 appointmentDao.save(appointment);
             }
-        });
         mainPane.getChildren().add(bookButton);
     
         Scene mainScene = new Scene(mainPane, 800, 600);
@@ -140,22 +144,48 @@ public class MainApp extends Application {
     }
     
     private void setupBarberInterface(Barber barber) {
-        VBox mainPane = new VBox();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/barber_interface.fxml"));
+            VBox mainPane = loader.load();
     
-        // Display barber's name
-        Label welcomeLabel = new Label("Welcome, " + barber.getName());
-        mainPane.getChildren().add(welcomeLabel);
+            Label welcomeLabel = (Label) loader.getNamespace().get("welcomeLabel");
+            welcomeLabel.setText("Welcome, " + barber.getName());
     
-        // Display appointments
-        List<Appointment> appointments = appointmentDao.findAllByBarber(barber);
-        ListView<String> appointmentsList = new ListView<>();
-        for (Appointment appointment : appointments) {
-            appointmentsList.getItems().add(appointment.toString());
+            ListView<String> appointmentsList = (ListView<String>) loader.getNamespace().get("appointmentsList");
+    
+            // Display appointments
+            List<Appointment> appointments = appointmentDao.findAllByBarber(barber);
+            for (Appointment appointment : appointments) {
+                appointmentsList.getItems().add(appointment.toString());
+            }
+    
+            Scene mainScene = new Scene(mainPane, 800, 600);
+            primaryStage.setScene(mainScene);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        mainPane.getChildren().add(appointmentsList);
+    }
+
+
+    private void initializeDatabase() {
+        PersonDao<Customer> customerDao = new PersonDao<>(Customer.class);
+        PersonDao<Barber> barberDao = new PersonDao<>(Barber.class);
     
-        Scene mainScene = new Scene(mainPane, 800, 600);
-        primaryStage.setScene(mainScene);
+        // Create some customers
+        Customer customer1 = new Customer("customer1", "password1", "John Doe");
+        Customer customer2 = new Customer("customer2", "password2", "Jane Doe");
+    
+        // Save the customers to the database
+        customerDao.save(customer1);
+        customerDao.save(customer2);
+    
+        // Create some barbers
+        Barber barber1 = new Barber("barber1", "password1", "Barber Bob");
+        Barber barber2 = new Barber("barber2", "password2", "Barber Alice");
+    
+        // Save the barbers to the database
+        barberDao.save(barber1);
+        barberDao.save(barber2);
     }
     public static void main(String[] args) {
         launch(args);

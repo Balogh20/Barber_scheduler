@@ -1,0 +1,8 @@
+<VBox fx:id="mainPane" spacing="10" padding="10" xmlns:fx="http://javafx.com/fxml%22%3E
+    <Label fx:id="welcomeLabel" />
+    <Label text="Your appointments:" />
+    <ListView fx:id="appointmentsList" />
+    <Label text="Book an appointment:" />
+    <DatePicker fx:id="datePicker" />
+    <Button fx:id="bookButton" text="Book Appointment" />
+</VBox>
