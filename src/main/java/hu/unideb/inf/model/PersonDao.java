@@ -1,6 +1,5 @@
 package hu.unideb.inf.model;
 
-import hu.unideb.inf.model.Person;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;

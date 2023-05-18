@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import antlr.collections.List;
+import java.util.List;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -101,11 +101,11 @@ public class MainApp extends Application {
     }
 
     private void setupCustomerInterface(Customer customer) {
-        VBox mainPane = new VBox();
+        VBox mainPane;
     
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/path/to/your/fxml/customer_interface.fxml"));
-            VBox mainPane = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/customer_interface.fxml"));
+            mainPane = loader.load();
         // Display customer's name
         Label welcomeLabel = new Label("Welcome, " + customer.getName());
         mainPane.getChildren().add(welcomeLabel);
@@ -141,7 +141,12 @@ public class MainApp extends Application {
     
         Scene mainScene = new Scene(mainPane, 800, 600);
         primaryStage.setScene(mainScene);
+        }}catch (IOException e)
+        {
+        e.printStackTrace();
+        }
     }
+
     
     private void setupBarberInterface(Barber barber) {
         try {
@@ -152,12 +157,17 @@ public class MainApp extends Application {
             welcomeLabel.setText("Welcome, " + barber.getName());
     
             ListView<String> appointmentsList = (ListView<String>) loader.getNamespace().get("appointmentsList");
+
+            if(appointmentsList!=null)
+            {
+
+            
     
             // Display appointments
             List<Appointment> appointments = appointmentDao.findAllByBarber(barber);
             for (Appointment appointment : appointments) {
                 appointmentsList.getItems().add(appointment.toString());
-            }
+            }}
     
             Scene mainScene = new Scene(mainPane, 800, 600);
             primaryStage.setScene(mainScene);
@@ -168,8 +178,7 @@ public class MainApp extends Application {
 
 
     private void initializeDatabase() {
-        PersonDao<Customer> customerDao = new PersonDao<>(Customer.class);
-        PersonDao<Barber> barberDao = new PersonDao<>(Barber.class);
+       
     
         // Create some customers
         Customer customer1 = new Customer("customer1", "password1", "John Doe");
